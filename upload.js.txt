@@ -1,0 +1,230 @@
+// FileUpload.js
+import React, { useState } from 'react';
+import Papa from 'papaparse';
+import axios from 'axios';
+
+const FileUpload = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [csvData, setCsvData] = useState([]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      axios
+        .post('http://your-server-endpoint/upload', formData)
+        .then((response) => {
+          // Handle the response from the server, if needed
+          console.log('Upload successful:', response.data);
+
+          // Now parse the CSV data from the server response
+          Papa.parse(response.data, {
+            complete: (result) => {
+              const headers = result.data[0];
+              const data = result.data.slice(1);
+
+              setCsvData({ headers, data });
+            },
+            header: true,
+          });
+        })
+        .catch((error) => {
+          console.error('Error uploading file:', error);
+        });
+    } else {
+      console.log('No file selected');
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" accept=".csv" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Upload CSV</button>
+
+      {csvData.headers && (
+        <div>
+          <h2>CSV Data:</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                {csvData.headers.map((header, index) => (
+                  <th key={index}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {csvData.data.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {csvData.headers.map((header, colIndex) => (
+                    <td key={colIndex}>{row[header]}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FileUpload;
+
+--------------------------************************************************---------------------------------------------------
+
+other type.....
+
+// FileUpload.js
+import React, { useState } from 'react';
+import Papa from 'papaparse';
+
+const FileUpload = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [csvData, setCsvData] = useState([]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      Papa.parse(selectedFile, {
+        complete: (result) => {
+          // Assuming the first row contains headers
+          const headers = result.data[0];
+          const data = result.data.slice(1); // Exclude header row
+
+          setCsvData({ headers, data });
+        },
+        header: true,
+      });
+    } else {
+      console.log('No file selected');
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" accept=".csv" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Upload CSV</button>
+
+      {csvData.headers && (
+        <div>
+          <h2>CSV Data:</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                {csvData.headers.map((header, index) => (
+                  <th key={index}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {csvData.data.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {csvData.headers.map((header, colIndex) => (
+                    <td key={colIndex}>{row[header]}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FileUpload;
+
+-------------------continue and intergrate-----
+// App.js
+import React from 'react';
+import FileUpload from './FileUpload';
+
+function App() {
+  return (
+    <div className="App">
+      <h1>CSV File Upload App</h1>
+      <FileUpload />
+    </div>
+  );
+}
+
+export default App;
+
+
+----------*******************************************************************************------------------------------------------------------------------
+
+other type----------------------------------
+
+// src/App.js
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const App = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [csvData, setCsvData] = useState([]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleUpload = async () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await axios.post('http://localhost:5000/upload', formData);
+        setCsvData(response.data);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    } else {
+      console.log('No file selected');
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" accept=".csv" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Upload CSV</button>
+
+      {csvData.length > 0 && (
+        <div>
+          <h2>CSV Data:</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                {Object.keys(csvData[0]).map((header, index) => (
+                  <th key={index}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {csvData.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {Object.values(row).map((value, colIndex) => (
+                    <td key={colIndex}>{value}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
+------------------------*******************************--------------------------------
