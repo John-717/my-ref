@@ -1,46 +1,61 @@
-import React,{useEffect,useState} from 'react';
-import './App.css';
-import ProductList from './ProductListing';
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import FormTodo from "./FormTodo";
+import Todo from "./Todo";
+import { Card ,Row,Col} from "react-bootstrap";
 
+function App() {
+   // eslint-disable-next-line
+  const [todos, setTodos] = useState([
+    {
+      text: "please add your lists",
+      isDone: false,
+    },
+  ]);
+  
+  const addTodo =(text)=>{
+    const newTodos = [...todos,{text,isDone:false}]
+    setTodos(newTodos)
+  }
 
-// const products = [
-//   {
-//     id: 1,
-//     name: 'Product 1',
-//     price: 19.99,
-//     image: 'https://via.placeholder.com/150',
-//   },
-//   {
-//     id: 2,
-//     name: 'Product 2',
-//     price: 24.99,
-//     image: 'https://via.placeholder.com/150',
-//   },
-//   {
-//     id: 3,
-//     name: 'Product 3',
-//     price: 29.99,
-//     image: 'https://via.placeholder.com/150',
-//   },
-//   // Add more products as needed
-// ];
+  const markTodo =(index)=>{
+    const newTodos = [...todos]
+    newTodos[index].isDone = !newTodos[index].isDone;
+    setTodos(newTodos)
+  }
 
-const App = () => {
+  const deleteTodo =(index)=>{
+    const newTodos = [...todos]
+    newTodos.splice(index,1)
+    setTodos(newTodos)
+  }
 
-  const [products, setProducts] = useState({});
-
-  useEffect(() => {
-    // Fetch products from your API
-    fetch("https://world.openfoodfacts.org/api/v0/product/737628064502.json")
-      .then((response) => response.json())
-      .then((data) => setProducts(data))
-      .catch((error) => console.error("Error fetching products:", error));
-  }, []);
-console.log("products", products)
   return (
-    <div className="App">
-      <h1>My E-Commerce Website</h1>
-    <ProductList products={products} />
+    <div className="app">
+      <div className="container">
+        <h1 className="text-center mb-4">Todo List</h1>
+        <FormTodo addTodo={addTodo}/>
+        <br/>
+        <div>
+          {todos.map((todo,index) => {
+            return (
+              <Row mt-4>
+              <Col className="col-md-6 offset-md-3">
+            <Card className="mx-auto my-2">
+            <Card.Body>
+            <Todo todo={todo} index={index}
+            markTodo={markTodo}
+            deleteTodo={deleteTodo}
+            />
+            </Card.Body>
+          </Card>
+          </Col>
+          </Row>
+            )
+          })}
+        </div>
+      </div>
     </div>
   );
 }

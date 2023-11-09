@@ -1,6 +1,7 @@
-.App {
+.app {
   text-align: center;
-}
-
-
-
+    background-color: #282c34;
+    padding: 30px;
+    color: white;
+    min-height: 100vh;
+  }
